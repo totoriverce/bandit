@@ -86,6 +86,7 @@ class Issue:
         test_id="",
         col_offset=0,
         end_col_offset=0,
+        fix=None,
     ):
         self.severity = severity
         self.cwe = Cwe(cwe)
@@ -102,6 +103,7 @@ class Issue:
         self.col_offset = col_offset
         self.end_col_offset = end_col_offset
         self.linerange = []
+        self.fix = fix
 
     def __str__(self):
         return (
@@ -194,7 +196,7 @@ class Issue:
             if not len(text):
                 break
             lines.append(tmplt % (line, text))
-        return "".join(lines)
+        return "".join(lines).rstrip()
 
     def as_dict(self, with_code=True, max_lines=3):
         """Convert the issue to a dict of values for outputting."""
@@ -214,6 +216,8 @@ class Issue:
 
         if with_code:
             out["code"] = self.get_code(max_lines=max_lines)
+        if self.fix:
+            out["fix"] = self.fix
         return out
 
     def from_dict(self, data, with_code=True):
@@ -229,6 +233,7 @@ class Issue:
         self.linerange = data["line_range"]
         self.col_offset = data.get("col_offset", 0)
         self.end_col_offset = data.get("end_col_offset", 0)
+        self.fix = data.get("fix")
 
 
 def cwe_from_dict(data):
